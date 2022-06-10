@@ -81,6 +81,11 @@ class MapControllerImpl implements MapController {
   }
 
   @override
+  bool tilt(double pitch, {String? id}) {
+    return _state.tilt(pitch, id: id, source: MapEventSource.mapController);
+  }
+
+  @override
   LatLng? pointToLatLng(CustomPoint localPoint) {
     if (_state.originalSize == null) {
       return null;
@@ -123,16 +128,21 @@ class MapControllerImpl implements MapController {
 class MapState {
   MapOptions options;
   final ValueChanged<double> onRotationChanged;
+  final ValueChanged<double> onPitchChanged;
   final StreamController<void> _onMoveSink;
   final StreamSink<MapEvent> _mapEventSink;
 
   double _zoom;
   double _rotation;
   double _rotationRad;
+  double _pitch;
+  double _pitchRad;
 
   double get zoom => _zoom;
 
   double get rotation => _rotation;
+  double get pitch => _pitch;
+  double get pitchRad => degToRadian(_pitch);
 
   set rotation(double rotation) {
     _rotation = rotation;
@@ -141,15 +151,34 @@ class MapState {
 
   double get rotationRad => _rotationRad;
 
+  set pitch(double pitch) {
+    _pitch = pitch;
+    _pitchRad = degToRadian(pitch);
+  }
+
   LatLng? _lastCenter;
   LatLngBounds? _lastBounds;
   Bounds? _lastPixelBounds;
   late CustomPoint _pixelOrigin;
   bool _initialized = false;
 
-  MapState(this.options, this.onRotationChanged, this._mapEventSink)
+  Matrix4 get transform {
+    var x = Matrix4.identity();
+    if (_rotation != 0.0) {
+      x.rotateZ(_rotationRad);
+    }
+    if (_pitch != 0.0) {
+      x.rotateX(_pitchRad);
+    }
+    return x;
+  }
+
+  MapState(this.options, this.onRotationChanged, this.onPitchChanged,
+      this._mapEventSink)
       : _rotation = options.rotation,
         _rotationRad = degToRadian(options.rotation),
+        _pitch = options.pitch,
+        _pitchRad = degToRadian(options.pitch),
         _zoom = options.zoom,
         _onMoveSink = StreamController.broadcast();
 
@@ -360,6 +389,39 @@ class MapState {
     }
 
     return false;
+  }
+
+  bool tilt(
+    double pitch, {
+    hasGesture = false,
+    callOnMoveSink = true,
+    required MapEventSource source,
+    String? id,
+  }) {
+    if (pitch == _pitch) {
+      return false;
+    }
+    var oldPitch = _pitch;
+    this.pitch = pitch;
+
+    onPitchChanged(_pitch);
+
+    emitMapEvent(
+      MapEventPitch(
+        id: id,
+        currentPitch: oldPitch,
+        targetPitch: _pitch,
+        center: _lastCenter!,
+        zoom: _zoom,
+        source: source,
+      ),
+    );
+
+    if (callOnMoveSink) {
+      _onMoveSink.add(null);
+    }
+
+    return true;
   }
 
   MoveAndRotateResult moveAndRotate(LatLng center, double zoom, double degree,
