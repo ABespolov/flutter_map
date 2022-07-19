@@ -393,8 +393,8 @@ class MapState {
 
   bool tilt(
     double pitch, {
-    hasGesture = false,
-    callOnMoveSink = true,
+    bool hasGesture = false,
+    bool callOnMoveSink = true,
     required MapEventSource source,
     String? id,
   }) {

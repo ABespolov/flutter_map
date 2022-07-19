@@ -479,7 +479,7 @@ abstract class MapGestureMixin extends State<FlutterMap>
           if (_pitchStarted) {
             final currentPitch = mapState.pitch;
             final newPitch =
-                max(0, min(90, currentPitch + (90 * (pitchDistance / 200))));
+                math.max(0, math.min(90, currentPitch + (90 * (pitchDistance / 200))));
             mapPitched =
                 mapState.tilt(newPitch.toDouble(), source: eventSource);
           }
