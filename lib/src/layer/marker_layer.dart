@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/core/bounds.dart';
@@ -251,7 +253,13 @@ class _MarkerLayerState extends State<MarkerLayer> {
         final cacheUpdated = updatePxCacheIfNeeded();
 
         for (var i = 0; i < layerOptions.markers.length; i++) {
-          final marker = layerOptions.markers[i];
+          var marker = layerOptions.markers[i];
+
+          marker = Marker(
+              point: marker.point,
+              builder: marker.builder,
+              height: marker.height / (1 / pow(widget.map.zoom / 10, 2.3)),
+              width: marker.width / (1 / pow(widget.map.zoom / 10, 2.3)));
 
           // Decide whether to use cached point or calculate it
           final pxPoint = usePxCache && (sameZoom || cacheUpdated)
