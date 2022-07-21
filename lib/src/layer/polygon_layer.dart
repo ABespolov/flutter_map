@@ -46,6 +46,7 @@ class Polygon {
   final String? label;
   final TextStyle labelStyle;
   final PolygonLabelPlacement labelPlacement;
+  final void Function()? onPolygonTap;
 
   Polygon({
     required this.points,
@@ -59,6 +60,7 @@ class Polygon {
     this.label,
     this.labelStyle = const TextStyle(),
     this.labelPlacement = PolygonLabelPlacement.centroid,
+    this.onPolygonTap
   }) : holeOffsetsList = null == holePointsList || holePointsList.isEmpty
             ? null
             : List.generate(holePointsList.length, (_) => []);
@@ -124,12 +126,13 @@ class PolygonLayer extends StatelessWidget {
             }
           }
 
-          polygons.add(
-            CustomPaint(
+          polygons.add(GestureDetector(
+            onTap: polygon.onPolygonTap,
+            child: CustomPaint(
               painter: PolygonPainter(polygon),
               size: size,
             ),
-          );
+          ));
         }
 
         return Stack(

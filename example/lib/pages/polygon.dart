@@ -80,13 +80,15 @@ class PolygonPage extends StatelessWidget {
                       borderStrokeWidth: 4.0,
                     ),
                     Polygon(
-                      points: filledDotedPoints,
-                      isFilled: true,
-                      isDotted: true,
-                      borderStrokeWidth: 4.0,
-                      borderColor: Colors.lightBlue,
-                      color: Colors.lightBlue,
-                    ),
+                        points: filledDotedPoints,
+                        isFilled: true,
+                        isDotted: true,
+                        borderStrokeWidth: 4.0,
+                        borderColor: Colors.lightBlue,
+                        color: Colors.lightBlue,
+                        onPolygonTap: () {
+                          print('onPolygonTap');
+                        }),
                   ]),
                 ],
               ),
