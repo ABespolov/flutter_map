@@ -153,6 +153,7 @@ class Marker {
   /// [Directionality.of] returns	 [TextDirection.ltr], and `-1.0` if
   /// [Directionality.of] returns [TextDirection.rtl].
   final AlignmentGeometry? rotateAlignment;
+  final double scalingCoefficient;
 
   Marker({
     required this.point,
@@ -163,6 +164,7 @@ class Marker {
     this.rotate,
     this.rotateOrigin,
     this.rotateAlignment,
+    this.scalingCoefficient = 1.0,
     AnchorPos? anchorPos,
   }) : anchor = Anchor.forPos(anchorPos, width, height);
 }
@@ -258,8 +260,18 @@ class _MarkerLayerState extends State<MarkerLayer> {
           marker = Marker(
               point: marker.point,
               builder: marker.builder,
-              height: marker.height / (1 / pow(widget.map.zoom / 10, 2.3)),
-              width: marker.width / (1 / pow(widget.map.zoom / 10, 2.3)));
+              //TODO fix it
+              height: marker.scalingCoefficient == 1
+                  ? marker.height
+                  : marker.height /
+                      (1 /
+                          pow(widget.map.zoom / 10, marker.scalingCoefficient)),
+              width: marker.scalingCoefficient == 1
+                  ? marker.width
+                  : marker.width /
+                      (1 /
+                          pow(widget.map.zoom / 10,
+                              marker.scalingCoefficient)));
 
           // Decide whether to use cached point or calculate it
           final pxPoint = usePxCache && (sameZoom || cacheUpdated)
