@@ -154,6 +154,7 @@ class Marker {
   /// [Directionality.of] returns [TextDirection.rtl].
   final AlignmentGeometry? rotateAlignment;
   final double scalingCoefficient;
+  final Size Function(double zoom)? calculateSize;
 
   Marker({
     required this.point,
@@ -165,6 +166,7 @@ class Marker {
     this.rotateOrigin,
     this.rotateAlignment,
     this.scalingCoefficient = 1.0,
+    this.calculateSize,
     AnchorPos? anchorPos,
   }) : anchor = Anchor.forPos(anchorPos, width, height);
 }
@@ -207,7 +209,7 @@ class _MarkerLayerState extends State<MarkerLayer> {
     if (widget.markerLayerOptions.usePxCache) {
       return List.generate(
         widget.markerLayerOptions.markers.length,
-        (i) => widget.map.project(widget.markerLayerOptions.markers[i].point),
+            (i) => widget.map.project(widget.markerLayerOptions.markers[i].point),
       );
     }
     return [];
@@ -257,22 +259,32 @@ class _MarkerLayerState extends State<MarkerLayer> {
         for (var i = 0; i < layerOptions.markers.length; i++) {
           var marker = layerOptions.markers[i];
 
+          double mHeight = marker.scalingCoefficient == 1
+              ? marker.height
+              : marker.height /
+              (1 /
+                  pow(widget.map.zoom / 10, marker.scalingCoefficient));
+          double mWidth = marker.scalingCoefficient == 1
+              ? marker.width
+              : marker.width /
+              (1 /
+                  pow(widget.map.zoom / 10,
+                      marker.scalingCoefficient));
+
+          final calcSize = marker.calculateSize;
+
+          if(calcSize != null) {
+            final size = calcSize(widget.map.zoom);
+            mWidth = size.width;
+            mHeight = size.height;
+          }
+
           marker = Marker(
               key: marker.key,
               point: marker.point,
               builder: marker.builder,
-              //TODO fix it
-              height: marker.scalingCoefficient == 1
-                  ? marker.height
-                  : marker.height /
-                      (1 /
-                          pow(widget.map.zoom / 10, marker.scalingCoefficient)),
-              width: marker.scalingCoefficient == 1
-                  ? marker.width
-                  : marker.width /
-                      (1 /
-                          pow(widget.map.zoom / 10,
-                              marker.scalingCoefficient)));
+              height: mHeight,
+              width: mWidth);
 
           // Decide whether to use cached point or calculate it
           final pxPoint = usePxCache && (sameZoom || cacheUpdated)
@@ -293,14 +305,14 @@ class _MarkerLayerState extends State<MarkerLayer> {
 
           final pos = pxPoint - map.getPixelOrigin();
           final markerWidget = (marker.rotate ?? layerOptions.rotate ?? false)
-              // Counter rotated marker to the map rotation
+          // Counter rotated marker to the map rotation
               ? Transform.rotate(
-                  angle: -map.rotationRad,
-                  origin: marker.rotateOrigin ?? layerOptions.rotateOrigin,
-                  alignment:
-                      marker.rotateAlignment ?? layerOptions.rotateAlignment,
-                  child: marker.builder(context),
-                )
+            angle: -map.rotationRad,
+            origin: marker.rotateOrigin ?? layerOptions.rotateOrigin,
+            alignment:
+            marker.rotateAlignment ?? layerOptions.rotateAlignment,
+            child: marker.builder(context),
+          )
               : marker.builder(context);
 
           markers.add(

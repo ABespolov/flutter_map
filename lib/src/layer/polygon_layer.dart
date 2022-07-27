@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/layer/label.dart';
@@ -95,13 +96,40 @@ class PolygonLayer extends StatelessWidget {
     );
   }
 
+  dynamic howAlertDialog(BuildContext context) {
+
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () { },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("My title"),
+      content: Text("This is my message."),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog<AlertDialog>(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   Widget _build(BuildContext context, Size size) {
     return StreamBuilder(
       stream: stream, // a Stream<void> or null
       builder: (BuildContext context, _) {
         final polygons = <Widget>[];
 
-        for (final polygon in polygonOpts.polygons) {
+        for (var i = 0; i < polygonOpts.polygons.length; i++) {
+          final polygon = polygonOpts.polygons[i];
           polygon.offsets.clear();
 
           if (null != polygon.holeOffsetsList) {
@@ -126,8 +154,10 @@ class PolygonLayer extends StatelessWidget {
             }
           }
 
+         // final data = LatLng(polygon.points[0].latitude, polygon.points[0].longitude).toString();
+
           polygons.add(GestureDetector(
-            onTap: polygon.onPolygonTap,
+            onTap: () => howAlertDialog(context),
             child: CustomPaint(
               painter: PolygonPainter(polygon),
               size: size,
