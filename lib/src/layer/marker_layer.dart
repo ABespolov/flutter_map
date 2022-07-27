@@ -258,6 +258,7 @@ class _MarkerLayerState extends State<MarkerLayer> {
           var marker = layerOptions.markers[i];
 
           marker = Marker(
+              key: marker.key,
               point: marker.point,
               builder: marker.builder,
               //TODO fix it
