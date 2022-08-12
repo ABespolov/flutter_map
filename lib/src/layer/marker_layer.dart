@@ -154,6 +154,7 @@ class Marker {
   /// [Directionality.of] returns [TextDirection.rtl].
   final AlignmentGeometry? rotateAlignment;
   final double scalingCoefficient;
+  final int zIndex;
   final Size Function(double zoom)? calculateSize;
 
   Marker({
@@ -166,6 +167,7 @@ class Marker {
     this.rotateOrigin,
     this.rotateAlignment,
     this.scalingCoefficient = 1.0,
+    this.zIndex = 1,
     this.calculateSize,
     AnchorPos? anchorPos,
   }) : anchor = Anchor.forPos(anchorPos, width, height);
