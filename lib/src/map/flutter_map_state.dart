@@ -179,11 +179,11 @@ class FlutterMapState extends MapGestureMixin {
                   angle: mapState.rotationRad,
                   child: Stack(
                     children: [
-                      if (widget.children.isNotEmpty) ...widget.children,
                       if (widget.layers.isNotEmpty)
                         ...widget.layers.map(
                           (layer) => _createLayer(layer, options.plugins),
-                        )
+                        ),
+                      if (widget.children.isNotEmpty) ...widget.children,
                     ],
                   )),
             ),
