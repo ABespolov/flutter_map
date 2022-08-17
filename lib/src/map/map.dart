@@ -6,6 +6,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/core/bounds.dart';
 import 'package:flutter_map/src/map/map_state_widget.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
+
+typedef RawTapCallback = bool Function(TapPosition position);
 
 class MapControllerImpl implements MapController {
   final Completer<void> _readyCompleter = Completer<void>();
@@ -131,6 +134,7 @@ class MapState {
   final ValueChanged<double> onPitchChanged;
   final StreamController<void> _onMoveSink;
   final StreamSink<MapEvent> _mapEventSink;
+  late RawTapCallback? onTapRaw;
 
   double _zoom;
   double _rotation;

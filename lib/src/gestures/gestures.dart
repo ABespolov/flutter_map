@@ -587,12 +587,16 @@ abstract class MapGestureMixin extends State<FlutterMap>
     closeFlingAnimationController(MapEventSource.tap);
     closeDoubleTapController(MapEventSource.tap);
 
+    var _callOnTap = true;
+    if(mapState.onTapRaw != null){
+      _callOnTap = mapState.onTapRaw!(position);
+    }
+
     final latlng = _offsetToCrs(position.relative!);
-    if (options.onTap != null) {
+    if (options.onTap != null && _callOnTap) {
       // emit the event
       options.onTap!(position, latlng);
     }
-
     mapState.emitMapEvent(
       MapEventTap(
         tapPosition: latlng,
