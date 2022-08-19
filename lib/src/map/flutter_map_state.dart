@@ -77,89 +77,93 @@ class FlutterMapState extends MapGestureMixin {
     _disposeStreamGroups();
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      final hasLateSize = mapState.hasLateSize(constraints);
+          final hasLateSize = mapState.hasLateSize(constraints);
 
-      mapState.setOriginalSize(constraints.maxWidth, constraints.maxHeight);
+          mapState.setOriginalSize(constraints.maxWidth, constraints.maxHeight);
 
-      // It's possible on first call to LayoutBuilder, it may not know a size
-      // which will cause methods like fitBounds to break. These methods
-      // could be called in initIfLateSize()
-      if (hasLateSize) {
-        mapState.initIfLateSize();
-      }
-      final size = mapState.size;
+          // It's possible on first call to LayoutBuilder, it may not know a size
+          // which will cause methods like fitBounds to break. These methods
+          // could be called in initIfLateSize()
+          if (hasLateSize) {
+            mapState.initIfLateSize();
+          }
+          final size = mapState.size;
 
-      final scaleGestureTeam = GestureArenaTeam();
+          final scaleGestureTeam = GestureArenaTeam();
 
-      RawGestureDetector scaleGestureDetector({required Widget child}) =>
-          RawGestureDetector(
-            gestures: <Type, GestureRecognizerFactory>{
-              ScaleGestureRecognizer:
+          RawGestureDetector scaleGestureDetector({required Widget child}) =>
+              RawGestureDetector(
+                gestures: <Type, GestureRecognizerFactory>{
+                  ScaleGestureRecognizer:
                   GestureRecognizerFactoryWithHandlers<ScaleGestureRecognizer>(
-                      () => ScaleGestureRecognizer(),
-                      (ScaleGestureRecognizer instance) {
-                scaleGestureTeam.captain = instance;
-                instance.team ??= scaleGestureTeam;
-                instance
-                  ..onStart = handleScaleStart
-                  ..onUpdate = handleScaleUpdate
-                  ..onEnd = handleScaleEnd;
-              }),
-              VerticalDragGestureRecognizer:
+                          () => ScaleGestureRecognizer(),
+                          (ScaleGestureRecognizer instance) {
+                        scaleGestureTeam.captain = instance;
+                        instance.team ??= scaleGestureTeam;
+                        instance
+                          ..onStart = handleScaleStart
+                          ..onUpdate = handleScaleUpdate
+                          ..onEnd = handleScaleEnd;
+                      }),
+                  VerticalDragGestureRecognizer:
                   GestureRecognizerFactoryWithHandlers<
-                          VerticalDragGestureRecognizer>(
-                      () => VerticalDragGestureRecognizer(),
-                      (VerticalDragGestureRecognizer instance) {
-                instance.team ??= scaleGestureTeam;
-                // these empty lambdas are necessary to activate this gesture recognizer
-                instance.onUpdate = (_) {};
-              }),
-              HorizontalDragGestureRecognizer:
+                      VerticalDragGestureRecognizer>(
+                          () => VerticalDragGestureRecognizer(),
+                          (VerticalDragGestureRecognizer instance) {
+                        instance.team ??= scaleGestureTeam;
+                        // these empty lambdas are necessary to activate this gesture recognizer
+                        instance.onUpdate = (_) {};
+                      }),
+                  HorizontalDragGestureRecognizer:
                   GestureRecognizerFactoryWithHandlers<
-                          HorizontalDragGestureRecognizer>(
-                      () => HorizontalDragGestureRecognizer(),
-                      (HorizontalDragGestureRecognizer instance) {
-                instance.team ??= scaleGestureTeam;
-                instance.onUpdate = (_) {};
-              })
-            },
-            child: child,
-          );
+                      HorizontalDragGestureRecognizer>(
+                          () => HorizontalDragGestureRecognizer(),
+                          (HorizontalDragGestureRecognizer instance) {
+                        instance.team ??= scaleGestureTeam;
+                        instance.onUpdate = (_) {};
+                      })
+                },
+                child: child,
+              );
 
-      return MapStateInheritedWidget(
-        mapState: mapState,
-        child: Listener(
-          onPointerDown: onPointerDown,
-          onPointerUp: onPointerUp,
-          onPointerCancel: onPointerCancel,
-          onPointerHover: onPointerHover,
-          onPointerSignal: onPointerSignal,
-          child: PositionedTapDetector2(
-            controller: _positionedTapController,
-            onTap: handleTap,
-            onLongPress: handleLongPress,
-            onDoubleTap: handleDoubleTap,
-            child: options.allowPanningOnScrollingParent
-                ? GestureDetector(
-                    onTap: _positionedTapController.onTap,
-                    onLongPress: _positionedTapController.onLongPress,
-                    onTapDown: _positionedTapController.onTapDown,
-                    onTapUp: handleOnTapUp,
-                    child: scaleGestureDetector(child: _buildMap(size)),
-                  )
-                : GestureDetector(
-                    onScaleStart: handleScaleStart,
-                    onScaleUpdate: handleScaleUpdate,
-                    onScaleEnd: handleScaleEnd,
-                    onTap: _positionedTapController.onTap,
-                    onLongPress: _positionedTapController.onLongPress,
-                    onTapDown: _positionedTapController.onTapDown,
-                    onTapUp: handleOnTapUp,
-                    child: _buildMap(size)),
-          ),
-        ),
-      );
-    });
+          return  MapStateInheritedWidget(
+            mapState: mapState,
+            child: Transform(
+                transform: Matrix4.rotationX(mapState.pitchRad),
+                alignment: Alignment.bottomCenter,
+                transformHitTests: true,
+                child:  Listener(
+                  onPointerDown: onPointerDown,
+                  onPointerUp: onPointerUp,
+                  onPointerCancel: onPointerCancel,
+                  onPointerHover: onPointerHover,
+                  onPointerSignal: onPointerSignal,
+                  child: PositionedTapDetector2(
+                    controller: _positionedTapController,
+                    onTap: handleTap,
+                    onLongPress: handleLongPress,
+                    onDoubleTap: handleDoubleTap,
+                    child: options.allowPanningOnScrollingParent
+                        ? GestureDetector(
+                      onTap: _positionedTapController.onTap,
+                      onLongPress: _positionedTapController.onLongPress,
+                      onTapDown: _positionedTapController.onTapDown,
+                      onTapUp: handleOnTapUp,
+                      child: scaleGestureDetector(child: _buildMap(size)),
+                    )
+                        : GestureDetector(
+                        onScaleStart: handleScaleStart,
+                        onScaleUpdate: handleScaleUpdate,
+                        onScaleEnd: handleScaleEnd,
+                        onTap: _positionedTapController.onTap,
+                        onLongPress: _positionedTapController.onLongPress,
+                        onTapDown: _positionedTapController.onTapDown,
+                        onTapUp: handleOnTapUp,
+                        child: _buildMap(size)),
+                  ),
+                )),
+          );
+        });
   }
 
   Widget _buildMap(CustomPoint<double> size) {
@@ -171,22 +175,17 @@ class FlutterMapState extends MapGestureMixin {
             maxWidth: size.x,
             minHeight: size.y,
             maxHeight: size.y,
-            child: Transform(
-              transform: Matrix4.rotationX(mapState.pitchRad),
-              alignment: Alignment.bottomCenter,
-              transformHitTests: true,
-              child: Transform.rotate(
-                  angle: mapState.rotationRad,
-                  child: Stack(
-                    children: [
-                      if (widget.layers.isNotEmpty)
-                        ...widget.layers.map(
-                          (layer) => _createLayer(layer, options.plugins),
-                        ),
-                      if (widget.children.isNotEmpty) ...widget.children,
-                    ],
-                  )),
-            ),
+            child: Transform.rotate(
+                angle: mapState.rotationRad,
+                child: Stack(
+                  children: [
+                    if (widget.layers.isNotEmpty)
+                      ...widget.layers.map(
+                            (layer) => _createLayer(layer, options.plugins),
+                      ),
+                    if (widget.children.isNotEmpty) ...widget.children,
+                  ],
+                )),
           ),
           Stack(
             children: [
@@ -194,7 +193,7 @@ class FlutterMapState extends MapGestureMixin {
                 ...widget.nonRotatedChildren,
               if (widget.nonRotatedLayers.isNotEmpty)
                 ...widget.nonRotatedLayers.map(
-                  (layer) => _createLayer(layer, options.plugins),
+                      (layer) => _createLayer(layer, options.plugins),
                 )
             ],
           ),
