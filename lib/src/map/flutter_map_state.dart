@@ -139,6 +139,7 @@ class FlutterMapState extends MapGestureMixin {
                   onPointerHover: onPointerHover,
                   onPointerSignal: onPointerSignal,
                   child: PositionedTapDetector2(
+                    doubleTapDelay: Duration.zero,
                     controller: _positionedTapController,
                     onTap: handleTap,
                     onLongPress: handleLongPress,
