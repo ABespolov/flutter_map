@@ -128,37 +128,41 @@ class FlutterMapState extends MapGestureMixin {
 
           return  MapStateInheritedWidget(
             mapState: mapState,
-            child: Listener(
-              onPointerDown: onPointerDown,
-              onPointerUp: onPointerUp,
-              onPointerCancel: onPointerCancel,
-              onPointerHover: onPointerHover,
-              onPointerSignal: onPointerSignal,
-              child: PositionedTapDetector2(
-                doubleTapDelay: Duration.zero,
-                controller: _positionedTapController,
-                onTap: handleTap,
-                onLongPress: handleLongPress,
-                onDoubleTap: handleDoubleTap,
-                child: options.allowPanningOnScrollingParent
-                    ? GestureDetector(
-                  onTap: _positionedTapController.onTap,
-                  onLongPress: _positionedTapController.onLongPress,
-                  onTapDown: _positionedTapController.onTapDown,
-                  onTapUp: handleOnTapUp,
-                  child: scaleGestureDetector(child: _buildMap(size)),
-                )
-                    : GestureDetector(
-                    onScaleStart: handleScaleStart,
-                    onScaleUpdate: handleScaleUpdate,
-                    onScaleEnd: handleScaleEnd,
-                    onTap: _positionedTapController.onTap,
-                    onLongPress: _positionedTapController.onLongPress,
-                    onTapDown: _positionedTapController.onTapDown,
-                    onTapUp: handleOnTapUp,
-                    child: _buildMap(size)),
-              ),
-            ),
+            child: Transform(
+                transform: Matrix4.rotationX(mapState.pitchRad),
+                alignment: Alignment.bottomCenter,
+                transformHitTests: true,
+                child:  Listener(
+                  onPointerDown: onPointerDown,
+                  onPointerUp: onPointerUp,
+                  onPointerCancel: onPointerCancel,
+                  onPointerHover: onPointerHover,
+                  onPointerSignal: onPointerSignal,
+                  child: PositionedTapDetector2(
+                    doubleTapDelay: Duration.zero,
+                    controller: _positionedTapController,
+                    onTap: handleTap,
+                    onLongPress: handleLongPress,
+                    onDoubleTap: handleDoubleTap,
+                    child: options.allowPanningOnScrollingParent
+                        ? GestureDetector(
+                      onTap: _positionedTapController.onTap,
+                      onLongPress: _positionedTapController.onLongPress,
+                      onTapDown: _positionedTapController.onTapDown,
+                      onTapUp: handleOnTapUp,
+                      child: scaleGestureDetector(child: _buildMap(size)),
+                    )
+                        : GestureDetector(
+                        onScaleStart: handleScaleStart,
+                        onScaleUpdate: handleScaleUpdate,
+                        onScaleEnd: handleScaleEnd,
+                        onTap: _positionedTapController.onTap,
+                        onLongPress: _positionedTapController.onLongPress,
+                        onTapDown: _positionedTapController.onTapDown,
+                        onTapUp: handleOnTapUp,
+                        child: _buildMap(size)),
+                  ),
+                )),
           );
         });
   }
@@ -178,7 +182,7 @@ class FlutterMapState extends MapGestureMixin {
                   children: [
                     if (widget.layers.isNotEmpty)
                       ...widget.layers.map(
-                            (layer) => _createLayerWithTransforms(layer, options.plugins),
+                            (layer) => _createLayer(layer, options.plugins),
                       ),
                     if (widget.children.isNotEmpty) ...widget.children,
                   ],
@@ -197,25 +201,6 @@ class FlutterMapState extends MapGestureMixin {
         ],
       ),
     );
-  }
-
-  Widget _transform(Widget widget) => _applyPitch(_applyRotation(widget));
-
-  Widget _applyRotation(Widget widget) =>
-      Transform.rotate(angle: mapState.rotationRad, child: widget);
-
-  Widget _applyPitch(Widget widget) => Transform(
-      transform: Matrix4.rotationX(mapState.pitchRad),
-      alignment: Alignment.center,
-      transformHitTests: true,
-      child: widget);
-
-  Widget _createLayerWithTransforms(
-      LayerOptions options, List<MapPlugin> plugins) {
-    var widget = _createLayer(options, plugins);
-    widget = _applyPitch(_applyRotation(widget));
-
-    return widget;
   }
 
   Widget _createLayer(LayerOptions options, List<MapPlugin> plugins) {
