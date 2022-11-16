@@ -128,11 +128,7 @@ class FlutterMapState extends MapGestureMixin {
 
           return  MapStateInheritedWidget(
             mapState: mapState,
-            child: Transform(
-                transform: Matrix4.rotationX(mapState.pitchRad),
-                alignment: Alignment.bottomCenter,
-                transformHitTests: true,
-                child:  Listener(
+            child: Listener(
                   onPointerDown: onPointerDown,
                   onPointerUp: onPointerUp,
                   onPointerCancel: onPointerCancel,
@@ -162,7 +158,7 @@ class FlutterMapState extends MapGestureMixin {
                         onTapUp: handleOnTapUp,
                         child: _buildMap(size)),
                   ),
-                )),
+                ),
           );
         });
   }
@@ -210,8 +206,12 @@ class FlutterMapState extends MapGestureMixin {
       }
     }
     if (options is TileLayerOptions) {
-      return TileLayer(
-          options: options, mapState: mapState, stream: _merge(options));
+      return Transform(
+          transform: Matrix4.rotationX(mapState.pitchRad),
+          alignment: Alignment.center,
+          transformHitTests: true,
+          child: TileLayer(
+              options: options, mapState: mapState, stream: _merge(options)));
     }
     if (options is MarkerLayerOptions) {
       return MarkerLayer(options, mapState, _merge(options));
