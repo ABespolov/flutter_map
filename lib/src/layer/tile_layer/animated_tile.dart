@@ -53,6 +53,8 @@ class _AnimatedTileState extends State<AnimatedTile> {
       widget.tile.animationController?.removeListener(_handleChange);
     }
 
+    widget.tile.imageInfo?.image.dispose();
+
     super.dispose();
   }
 
