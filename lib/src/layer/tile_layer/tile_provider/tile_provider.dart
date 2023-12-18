@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map/src/layer/tile_layer/tile_provider/network_image_with_retry.dart';
 
 abstract class TileProvider {
   const TileProvider();
@@ -52,13 +51,6 @@ abstract class TileProvider {
     }
     final index = (coords.x + coords.y).round() % options.subdomains.length;
     return options.subdomains[index];
-  }
-}
-
-class NetworkTileProvider extends TileProvider {
-  @override
-  ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
-    return NetworkImageWithRetry(getTileUrl(coords, options));
   }
 }
 
