@@ -95,7 +95,6 @@ Widget coordinateDebugTileBuilder(
         Center(
           child: Text(
             readableKey,
-            style: Theme.of(context).textTheme.headline5,
           ),
         ),
       ],
@@ -127,7 +126,6 @@ Widget loadingTimeDebugTileBuilder(
         Center(
           child: Text(
             time,
-            style: Theme.of(context).textTheme.headline5,
           ),
         ),
       ],
