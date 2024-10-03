@@ -350,7 +350,7 @@ class _TileLayerState extends State<TileLayer> with TickerProviderStateMixin {
     final pixelCenter = map.project(center, _tileZoom).floor();
     final halfSize = map.size / (scale * 2);
 
-    return Bounds(pixelCenter - halfSize / 1.2, pixelCenter + halfSize / 1.2);
+    return Bounds(pixelCenter - halfSize * 1.2, pixelCenter + halfSize * 1.2);
   }
 
   // Private method to load tiles in the grid's active zoom level according to

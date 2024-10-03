@@ -64,8 +64,7 @@ class TileManager {
       return;
     }
 
-    tile.dispose(
-        tile.loadError && evictStrategy != EvictErrorTileStrategy.none);
+    tile.dispose(true);
 
     _tiles.remove(key);
   }
