@@ -126,6 +126,9 @@ class MapControllerImpl implements MapController {
 
   @override
   Stream<MapEvent> get mapEventStream => _mapEventSink.stream;
+
+  @override
+  MapState get state => _state;
 }
 
 class MapState {

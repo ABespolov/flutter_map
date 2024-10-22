@@ -163,6 +163,8 @@ abstract class MapController {
 
   StreamSink<MapEvent> get mapEventSink;
 
+  MapState get state;
+
   set state(MapState state);
 
   void dispose();
@@ -330,9 +332,10 @@ class MapOptions {
       this.onTap,
       this.onLongPress,
       this.onPointerDown,
-    this.onPointerUp,
-    this.onPointerCancel,
-    this.onPointerHover,this.onPositionChanged,
+      this.onPointerUp,
+      this.onPointerCancel,
+      this.onPointerHover,
+      this.onPositionChanged,
       this.onMapCreated,
       this.plugins = const [],
       this.slideOnBoundaries = false,
@@ -340,7 +343,8 @@ class MapOptions {
       this.screenSize,
       this.controller,
       this.swPanBoundary,
-      this.nePanBoundary,this.maxBounds,
+      this.nePanBoundary,
+      this.maxBounds,
       this.pitch = 0.0})
       : center = center ?? LatLng(50.5, 30.51),
         assert(rotationThreshold >= 0.0),
