@@ -7,5 +7,7 @@ import 'package:flutter/foundation.dart';
 class LayerOptions {
   final Key? key;
   final Stream<void>? rebuild;
-  LayerOptions({this.key, this.rebuild});
+  final bool isTransform;
+
+  LayerOptions({this.key, this.rebuild, this.isTransform = false});
 }
