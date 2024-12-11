@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/gestures/latlng_tween.dart';
 import 'package:flutter_map/src/map/map.dart';
@@ -12,7 +11,7 @@ import 'package:positioned_tap_detector_2/positioned_tap_detector_2.dart';
 
 abstract class MapGestureMixin extends State<FlutterMap>
     with TickerProviderStateMixin {
-  static const int _kMinFlingVelocity = 800;
+  static const int _kMinFlingVelocity = 500;
 
   var _dragMode = false;
   var _gestureWinner = MultiFingerGesture.none;
@@ -478,8 +477,8 @@ abstract class MapGestureMixin extends State<FlutterMap>
           }
           if (_pitchStarted) {
             final currentPitch = mapState.pitch;
-            final newPitch =
-                math.max(0, math.min(90, currentPitch + (90 * (pitchDistance / 200))));
+            final newPitch = math.max(
+                0, math.min(90, currentPitch + (90 * (pitchDistance / 200))));
             mapPitched =
                 mapState.tilt(newPitch.toDouble(), source: eventSource);
           }
@@ -561,10 +560,13 @@ abstract class MapGestureMixin extends State<FlutterMap>
     }
 
     final direction = details.velocity.pixelsPerSecond / magnitude;
-    final distance = (Offset.zero &
+    final baseDistance = (Offset.zero &
             Size(mapState.originalSize!.x as double,
                 mapState.originalSize!.y as double))
         .shortestSide;
+
+    // Calculate dynamic distance based on velocity
+    final distance = (baseDistance / 4) * (magnitude / 1000).clamp(0.5, 3.0);
 
     final flingOffset = _focalStartLocal - _lastFocalLocal;
     _flingAnimation = Tween<Offset>(
@@ -572,14 +574,17 @@ abstract class MapGestureMixin extends State<FlutterMap>
       end: flingOffset - direction * distance,
     ).animate(_flingController);
 
+    final velocityScale = (magnitude / 1000).clamp(0.5, 2.0);
+
     _flingController
       ..value = 0.0
       ..fling(
-          velocity: magnitude / 1000.0,
+          velocity: magnitude / (1000.0 / velocityScale),
           springDescription: SpringDescription.withDampingRatio(
             mass: 1,
-            stiffness: 1000,
-            ratio: 5,
+            stiffness:
+                3000 / velocityScale, // Reduce stiffness for faster swipes
+            ratio: 3,
           ));
   }
 
@@ -588,7 +593,7 @@ abstract class MapGestureMixin extends State<FlutterMap>
     closeDoubleTapController(MapEventSource.tap);
 
     var _callOnTap = true;
-    if(mapState.onTapRaw != null){
+    if (mapState.onTapRaw != null) {
       _callOnTap = mapState.onTapRaw!(position);
     }
 
