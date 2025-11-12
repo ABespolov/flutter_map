@@ -181,7 +181,9 @@ class FlutterMapState extends MapGestureMixin {
                         (layer) {
                           if (layer.isTransform) {
                             return Transform(
-                                transform: Matrix4.rotationX(mapState.pitchRad),
+                                transform: Matrix4.identity()
+                                  ..setRotationX(mapState.pitchRad)
+                                  ..setEntry(3, 2, -0.001),
                                 alignment: Alignment.center,
                                 transformHitTests: true,
                                 child: _createLayer(layer, options.plugins));
@@ -215,7 +217,9 @@ class FlutterMapState extends MapGestureMixin {
     }
     if (options is TileLayerOptions) {
       return Transform(
-          transform: Matrix4.rotationX(mapState.pitchRad),
+          transform: Matrix4.identity()
+            ..setRotationX(mapState.pitchRad)
+            ..setEntry(3, 2, -0.001),
           alignment: Alignment.center,
           transformHitTests: true,
           child: TileLayer(
